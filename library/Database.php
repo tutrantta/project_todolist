@@ -22,6 +22,10 @@ class Database
 		return mysqli_affected_rows($this->connection);
 	}
 
+	function sqlInjectionPrevent($value) {
+		return mysqli_real_escape_string($this->connection, $value);
+	}
+
 	function query($sql) {
 		$queryData = $this->connection->query($sql);
 		if(!$this->getAffectedRows()) return false;
@@ -40,7 +44,7 @@ class Database
 		if(count($where)) {
 			$arrTempWhere = array();
 			foreach($where as $key => $value) {
-				if(is_string($value)) $arrTempWhere[] = '' . $key . " = '" . $value . "'";
+				if(is_string($value)) $arrTempWhere[] = '' . $key . " = '" . $this->sqlInjectionPrevent($value) . "'";
 				else $arrTempWhere[] = '' . $key . " = " . $value;
 			}
 			$strWhere = implode(' AND ', $arrTempWhere);
@@ -55,6 +59,7 @@ class Database
 		if($columns === array()) $sql .= '*';
 		else $sql .= implode(',', $columns);
 		$sql .= ' FROM ' . $table . ' ' . $this->where($where);
+		var_dump($sql);
 		return $this->query($sql);
 	}
 
@@ -65,7 +70,7 @@ class Database
 		$arrValues = array();
 		foreach($values as $key => $value) {
 			$arrKeys[] = $key;
-			if(is_string($value)) $arrValues[] = " '$value' ";
+			if(is_string($value)) $arrValues[] = " '" . $this->sqlInjectionPrevent($value) . "' ";
 			else $arrValues[]  = "$value";
 		}
 		$sql .= implode(',', $arrKeys) . ') VALUES (' . implode(',', $arrValues) . ')';
@@ -83,7 +88,7 @@ class Database
 	{
 		$arrTempValue = array();
 		foreach($values as $key => $value) {
-			if(is_string($value)) $arrTempValue[] = "$key = '$value' ";
+			if(is_string($value)) $arrTempValue[] = "$key = '" . $this->sqlInjectionPrevent($value) . "' ";
 			else $arrTempValue[]  = "$key = $value";
 		}
 		$strValue = implode(',', $arrTempValue);
