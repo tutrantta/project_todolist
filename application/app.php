@@ -2,6 +2,8 @@
 
 require_once '/../config/define.php';
 require_once '/../library/loader.php';
+require_once '/../core/baseController.php';
+require_once '/../core/baseModel.php';
 
 class Application
 {
