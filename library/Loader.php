@@ -28,9 +28,10 @@ class Loader
 		}
 	}
 
-	public function loadView($view = "") {
+	public function loadView($view = "", $data = array()) {
 		$viewDir = VIEWS_DIR . $view . '.php';
 		if(file_exists($viewDir)) {
+			extract($data);
 			require_once($viewDir);	
 		}
 		else {
